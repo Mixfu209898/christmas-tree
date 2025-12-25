@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>圣诞树 🎄 手机版</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+}
+
+.tree {
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.08s linear;
+    transform: scale(1.2);
+}
+
+.layer {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: solid transparent;
+    border-right: solid transparent;
+    border-bottom: solid #1a472a;
+    filter: drop-shadow(0 0 10px rgba(0,0,0,.5));
+}
+
+.layer-1 { border-left-width: 50px; border-right-width: 50px; border-bottom-width: 60px; top: -160px; }
+.layer-2 { border-left-width: 80px; border-right-width: 80px; border-bottom-width: 90px; top: -120px; }
+.layer-3 { border-left-width: 110px; border-right-width: 110px; border-bottom-width: 120px; top: -60px; }
+.layer-4 { border-left-width: 140px; border-right-width: 140px; border-bottom-width: 150px; top: 10px; }
+
+.trunk {
+    width: 40px;
+    height: 50px;
+    background: #3d2b1f;
+    position: absolute;
+    top: 160px;
+    left: -20px;
+    border-radius: 4px;
+}
+
+.star {
+    position: absolute;
+    top: -190px;
+    left: -20px;
+    font-size: 42px;
+    color: gold;
+    text-shadow: 0 0 20px gold;
+    animation: spin 3s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotateY(0); }
+    to { transform: rotateY(360deg); }
+}
+
+.ornament {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    animation: blink 2s infinite;
+}
+
+@keyframes blink {
+    50% { opacity: .4; }
+}
+
+.gift {
+    position: absolute;
+    bottom: -200px;
+    width: 32px;
+    height: 32px;
+    font-size: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: drop .5s ease-out forwards;
+}
+
+@keyframes drop {
+    from { transform: translateY(-400px) rotate(0); opacity: 0; }
+    to { transform: translateY(0) rotate(360deg); opacity: 1; }
+}
+
+.snow {
+    position: fixed;
+    top: -10px;
+    color: #fff;
+    pointer-events: none;
+}
+
+.hint {
+    position: fixed;
+    bottom: 16px;
+    color: rgba(255,255,255,.6);
+    font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="tree" id="tree">
+    <div class="star">★</div>
+    <div class="layer layer-1"></div>
+    <div class="layer layer-2"></div>
+    <div class="layer layer-3"></div>
+    <div class="layer layer-4"></div>
+    <div class="trunk"></div>
+</div>
+
+<div class="hint">👉 手指滑动晃树｜点树掉礼物</div>
+
+<script>
+const tree = document.getElementById('tree');
+const colors = ['#e63946','#ffb703','#a8dadc','#f1faee','#457b9d'];
+
+function initBalls() {
+    const cfgs = [
+        {top:-140,w:40},{top:-80,w:70},{top:0,w:100},{top:100,w:130}
+    ];
+    cfgs.forEach(c=>{
+        for(let i=0;i<5;i++){
+            const b=document.createElement('div');
+            b.className='ornament';
+            b.style.background=colors[Math.random()*5|0];
+            b.style.top=c.top+Math.random()*40+'px';
+            b.style.left=Math.random()*c.w-c.w/2+'px';
+            tree.appendChild(b);
+        }
+    });
+}
+
+let sx=0, sy=0;
+document.addEventListener('touchstart',e=>{
+    sx=e.touches[0].pageX;
+    sy=e.touches[0].pageY;
+});
+
+document.addEventListener('touchmove',e=>{
+    const dx=(e.touches[0].pageX-sx)/6;
+    const dy=(e.touches[0].pageY-sy)/6;
+    tree.style.transform=`scale(1.2) rotateY(${dx}deg) rotateX(${-dy}deg)`;
+});
+
+tree.addEventListener('click',()=>{
+    if(tree.querySelectorAll('.gift').length>8)return;
+    const g=document.createElement('div');
+    g.className='gift';
+    g.textContent=['🎁','🍬','🧸','🍫'][Math.random()*4|0];
+    g.style.left=Math.random()*200-100+'px';
+    tree.appendChild(g);
+    setTimeout(()=>g.remove(),4000);
+});
+
+function snow(){
+    const s=document.createElement('div');
+    s.className='snow';
+    s.textContent='❄';
+    s.style.left=Math.random()*100+'vw';
+    s.style.fontSize=Math.random()*8+10+'px';
+    document.body.appendChild(s);
+    s.animate([{transform:'translateY(0)'},{transform:'translateY(105vh)'}],
+        {duration:4000, easing:'linear'}).onfinish=()=>s.remove();
+}
+
+initBalls();
+setInterval(snow,350);
+</script>
+
+</body>
+</html>
